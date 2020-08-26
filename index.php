@@ -74,7 +74,7 @@ $colors = [
         }
     </style>
 
-    <title>PrestaShop Issues Stats</title>
+    <title>PrestaShop PRs Stats</title>
 </head>
 <body>
 <div class="container">
@@ -95,15 +95,6 @@ $colors = [
             <div class="col">
                 <button type="submit" class="btn btn-primary">Display data</button>
             </div>
-        </div>
-        <div class="container-labels">
-            <div class="form-row">
-                <div class="col">
-                    <h4>Types of labels</h4>
-                </div>
-            </div>
-
-
         </div>
     </form>
     <hr>
