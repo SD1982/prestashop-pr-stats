@@ -83,6 +83,7 @@ do {
         $currently_in_qa = false;
         $number_of_times_in_qa = 0;
         $total_time_as_wfqa = 0;
+        $labels = [];
         $events = $pr['node']['timelineItems']['nodes'];
         foreach ($events as $event) {
             $event_data = [
@@ -90,7 +91,7 @@ do {
                 'date' => date('Y-m-d H:i:s', strtotime($event['createdAt'])),
             ];
             //is this label in the array of tracked labels ?
-            if (!in_array($event['label']['name'], ['waiting for QA', 'QA ✔️'])) {
+            if (!in_array($event['label']['name'], ['waiting for QA', 'QA ✔️']) && !in_array($event['label']['name'], $labels)) {
                 $labels[] = $event['label']['name'];
             }
             if ($event['label']['name'] == 'waiting for QA') {
@@ -126,6 +127,12 @@ do {
     `total_time_as_wfqa` = :total_time_as_wfqa
     WHERE id = :id;';
         $mysql->query($sql, $pr_update_data);
+
+        //labels
+        foreach($labels as $label) {
+            $sql = 'INSERT INTO `label` (`pr_id`, `name`) VALUES (:pr_id, :name);';
+            $mysql->query($sql, ['pr_id' => $pr_db_id, 'name' => $label]);
+        }
     }
     $prs_data = $client->api('graphql')->execute($query);
 } while(count($prs_data['data']['repository']['pullRequests']['edges']) > 0 && 0);
