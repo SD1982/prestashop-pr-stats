@@ -26,7 +26,7 @@ AVG(total_time_as_wfqa) avg_total_time_as_wfqa
 FROM `pr` 
 WHERE 1=1
 AND merged BETWEEN :start_date AND :end_date
-group by YEARWEEK(merged, 3)
+group by YEARWEEK(merged, 3), weekday
 order by week ASC;";
 $data = [
         'start_date' => $start_date,
