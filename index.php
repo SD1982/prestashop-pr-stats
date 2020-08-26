@@ -87,10 +87,10 @@ $colors = [
         </div>
         <div class="form-row">
             <div class="col">
-                <input type="date" class="form-control" id="start_date_merged" name="start_date_merged" value="<?php echo $start_date; ?>" placeholder="Start Date">
+                <input type="date" class="form-control" id="start_date" name="start_date" value="<?php echo $start_date; ?>" placeholder="Start Date">
             </div>
             <div class="col">
-                <input type="date" class="form-control" id="end_date_merged" name="end_date_merged" value="<?php echo $end_date; ?>" placeholder="End Date">
+                <input type="date" class="form-control" id="end_date" name="end_date" value="<?php echo $end_date; ?>" placeholder="End Date">
             </div>
             <div class="col">
                 <button type="submit" class="btn btn-primary">Display data</button>
@@ -108,42 +108,27 @@ $colors = [
     </form>
     <hr>
     <canvas id="bar_data"></canvas>
-    <canvas id="pie_data"></canvas>
 </div>
-<script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3"></script>
 <script>
-    const colors = ['rgb(55, 55, 150)',
-        'rgb(50, 132, 184)',
-        'rgb(41, 158, 72)',
-        'rgb(158, 76, 41)',
-        'rgb(158, 152, 41)',
-        'rgb(41, 158, 49)',
-        'rgb(129, 157, 199)',
-        'rgb(55, 55, 150)',
-        'rgb(50, 132, 184)',
-        'rgb(41, 158, 72)',
-        'rgb(158, 76, 41)',
-        'rgb(158, 152, 41)',
-        'rgb(41, 158, 49)',
-        'rgb(129, 157, 199)'];
     let config_bar = {
         type: 'bar',
         data: {
             datasets: [{
                 data: <?php echo json_encode($avg_time_before_first_wfqa); ?>,
                 backgroundColor: 'rgb(55, 55, 150)',
-                label: 'Average time before first WFQA'
+                label: 'Average time before first WFQA',
+                yAxisID: 'timing'
             },{
                 data: <?php echo json_encode($avg_times_of_wfqa_labelling); ?>,
                 backgroundColor: 'rgb(158, 76, 41)',
-                label: 'Average number of times a PR is labelled WFQA'
+                label: 'Average number of times a PR is labelled WFQA',
+                yAxisID: 'int'
             },{
                 data: <?php echo json_encode($avg_total_time_as_wfqa); ?>,
                 backgroundColor: 'rgb(41, 158, 72)',
-                label: 'Average time in WFQA'
+                label: 'Average time in WFQA',
+                yAxisID: 'timing'
             }
 
             ],
@@ -154,14 +139,52 @@ $colors = [
                 display: true,
                 text: 'Various data about PRs'
             },
-            responsive: true
+            responsive: true,
+            scales: {
+                yAxes: [
+                    {
+                        id: 'int',
+                        type: 'linear',
+                        position: 'right',
+                        title: "toto"
+                    },
+                    {
+                        id: 'timing',
+                        type: 'linear',
+                        position: 'left',
+                    }
+                ]
+            },
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        if (data.datasets[tooltipItem.datasetIndex].yAxisID == 'timing') {
+                            return data.datasets[tooltipItem.datasetIndex].label + ": " + secondsToDhms(tooltipItem.yLabel);
+                        } else {
+                            return data.datasets[tooltipItem.datasetIndex].label + ": " + tooltipItem.yLabel;
+                        }
+                    }
+                }
+            }
         }
     };
 
     window.onload = function() {
-      var ctx_bar = document.getElementById('bar_data').getContext('2d');
-      window.myBar = new Chart(ctx_bar, config_bar);
+      const ctx_bar = document.getElementById('bar_data').getContext('2d');
+      const myBar = new Chart(ctx_bar, config_bar);
     };
+
+    function secondsToDhms(seconds) {
+        seconds = Number(seconds);
+        var d = Math.floor(seconds / (3600*24));
+        var h = Math.floor(seconds % (3600*24) / 3600);
+        var m = Math.floor(seconds % 3600 / 60);
+
+        var dDisplay = d > 0 ? d + (d == 1 ? " day, " : " days, ") : "";
+        var hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
+        var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes ") : "";
+        return dDisplay + hDisplay + mDisplay;
+    }
 </script>
 </body>
 </html>
