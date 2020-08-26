@@ -1,0 +1,9 @@
+<?php
+define('MYSQL_HOST', 'localhost');
+define('MYSQL_PORT', 3306);
+define('MYSQL_DATABASE', 'issuesstats');
+define('MYSQL_USER', 'root');
+define('MYSQL_PASSWORD', '');
+
+define('GITHUB_TOKEN', 'your_token_goes_here');
+define('SECURITY_TOKEN', 'your_security_token_goes_here');
