@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `pr` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `pr_id` int(11) NOT NULL,
   `name` varchar(300) NOT NULL,
+  `gh_cursor` varchar(100) NOT NULL,
   `created` timestamp NULL DEFAULT NULL,
   `merged` timestamp NULL DEFAULT NULL,
   `time_before_first_wfqa` int(11) DEFAULT NULL,

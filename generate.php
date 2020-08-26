@@ -14,7 +14,19 @@ $mysql = new PDOWrapper();
 $client = new Client();
 $client->authenticate(GITHUB_TOKEN, null, Github\Client::AUTH_ACCESS_TOKEN);
 
+//default starting cursor (2019-01-01)
 $after = 'Y3Vyc29yOnYyOpK5MjAxOC0xMi0zMVQxMzoxNzo1MyswMTowMM4OZeJt';
+
+$sql = 'SELECT gh_cursor
+FROM `pr`
+ORDER BY created DESC 
+LIMIT 1;';
+
+$last_insert = $mysql->query($sql);
+if (isset($last_insert['gh_cursor'])) {
+    $after = $last_insert['gh_cursor'];
+}
+
 $query = '
 {
   repository(name: "PrestaShop", owner: "PrestaShop") {
@@ -108,6 +120,7 @@ while(count($prs_data['data']['repository']['pullRequests']['edges']) > 0) {
             $pr_data = [
                 'pr_id' => $pr['node']['number'],
                 'name' => $pr['node']['title'],
+                'cursor' => $after,
                 'created' => date('Y-m-d H:i:s', strtotime($pr['node']['createdAt'])),
                 'merged' => date('Y-m-d H:i:s', strtotime($pr['node']['mergedAt'])),
                 'time_before_first_wfqa' => $time_before_first_wfqa,
@@ -115,9 +128,9 @@ while(count($prs_data['data']['repository']['pullRequests']['edges']) > 0) {
                 'total_time_as_wfqa' => $total_time_as_wfqa,
             ];
             //inserting in DB
-            $sql = 'INSERT INTO `pr` (`pr_id`, `name`, `created`, `merged`,
+            $sql = 'INSERT INTO `pr` (`pr_id`, `name`, `gh_cursor`, `created`, `merged`,
             `time_before_first_wfqa`, `times_of_wfqa_labelling`,`total_time_as_wfqa`) 
-    VALUES (:pr_id, :name, :created, :merged, :time_before_first_wfqa, :times_of_wfqa_labelling, :total_time_as_wfqa);';
+    VALUES (:pr_id, :name, :cursor, :created, :merged, :time_before_first_wfqa, :times_of_wfqa_labelling, :total_time_as_wfqa);';
             $mysql->query($sql, $pr_data);
             $pr_db_id = $mysql->lastInsertId();
             //labels
