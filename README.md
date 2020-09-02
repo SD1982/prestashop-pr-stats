@@ -9,11 +9,11 @@ It then calculate some stats using the events timeline associated with each PR:
 * total time spent in "Waiting for QA"
 
 ### Hot to install
-Use composer install to install all the dependencies.
+Use `composer install` to install all the dependencies.
 
 Create a database using the `schema.sql` file at the root of the project.
 
-Copy the config.php.dist file:
+Copy the `config.php.dist` file:
 
 * change the values inside for your correct MySQL values
 * add your [Github token](https://github.com/settings/tokens/new)
