@@ -1,6 +1,6 @@
 # prestashop-pr-stats
 
-This tool gather all data from the PrestaShop/PrestaShop repository about Pull Requests.
+This tool gather all data from the [PrestaShop/PrestaShop](https://github.com/PrestaShop/PrestaShop) repository about Pull Requests.
 Only **merged** Pull Requests with the label "QA ✔" are counted.
 
 It then calculate some stats using the events timeline associated with each PR:
@@ -16,7 +16,7 @@ Create a database using the `schema.sql` file at the root of the project.
 Copy the config.php.dist file:
 
 * change the values inside for your correct MySQL values
-* add your Github token
+* add your [Github token](https://github.com/settings/tokens/new)
 * add a security token (any passphrase will do)
 
 and rename it config.php.
