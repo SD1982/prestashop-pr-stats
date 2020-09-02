@@ -32,4 +32,7 @@ SECURITY_TOKEN=my_token php generate.php
 
 The script will gather all PR merged since the last one, using Github API cursors stored in the database.
 
-Then use the `index.php` file to browse the data.
+### Visualize the data 
+
+Use the `index.php` file to browse the data (any webserver configuration will do). All data is averaged by week.
+I'll probably add soon a toggle to show data per PR, average per day, average per week, etc.  
