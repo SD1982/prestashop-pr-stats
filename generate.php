@@ -64,6 +64,8 @@ $query = '
   }
 }';
 
+echo sprintf("---%s%s", date('Y-m-d H:i:s'), PHP_EOL);
+
 $prs_data = $client->api('graphql')->execute(str_replace('%AFTER%', $after, $query));
 
 while(count($prs_data['data']['repository']['pullRequests']['edges']) > 0) {
