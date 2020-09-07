@@ -66,11 +66,9 @@ while(count($prs_data['data']['repository']['pullRequests']['edges']) > 0) {
         $sql = 'SELECT id FROM `pr` WHERE pr_id = :pr_id;';
         $pr_exists = $mysql->query($sql, ['pr_id' => $pr['node']['number']]);
         if (isset($pr_exists['id'])) {
-            echo sprintf("PR %s found in database, skipping...%s", $pr['node']['number'], PHP_EOL);
+            $after = $pr['cursor'];
             continue;
         }
-        //putting the cursor to iterate on the next results
-        $after = $pr['cursor'];
 
         $pr_update_data = [];
         //setting up its state
