@@ -62,11 +62,11 @@ while(count($prs_data['data']['repository']['pullRequests']['edges']) > 0) {
     $prs = $prs_data['data']['repository']['pullRequests']['edges'];
     echo sprintf("Found %s PRs...%s", count($prs), PHP_EOL);
     foreach ($prs as $pr) {
+        $after = $pr['cursor'];
         //does this PR already exists in database ?
         $sql = 'SELECT id FROM `pr` WHERE pr_id = :pr_id;';
         $pr_exists = $mysql->query($sql, ['pr_id' => $pr['node']['number']]);
         if (isset($pr_exists['id'])) {
-            $after = $pr['cursor'];
             continue;
         }
 
