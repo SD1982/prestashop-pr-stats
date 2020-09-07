@@ -1,14 +1,3 @@
-DROP TABLE IF EXISTS `event`;
-CREATE TABLE IF NOT EXISTS `event` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `pr_id` int(11) NOT NULL,
-  `date` timestamp NULL DEFAULT NULL,
-  `type` varchar(30) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
 DROP TABLE IF EXISTS `label`;
 CREATE TABLE IF NOT EXISTS `label` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
