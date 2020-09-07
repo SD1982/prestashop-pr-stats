@@ -17,16 +17,6 @@ $client->authenticate(GITHUB_TOKEN, null, Github\Client::AUTH_ACCESS_TOKEN);
 //default starting cursor (2019-01-01)
 $after = 'Y3Vyc29yOnYyOpK5MjAxOC0xMi0zMVQxMzoxNzo1MyswMTowMM4OZeJt';
 
-$sql = 'SELECT gh_cursor
-FROM `pr`
-ORDER BY created DESC 
-LIMIT 1;';
-
-$last_insert = $mysql->query($sql);
-if (isset($last_insert['gh_cursor'])) {
-    $after = $last_insert['gh_cursor'];
-}
-
 $query = '
 {
   repository(name: "PrestaShop", owner: "PrestaShop") {
