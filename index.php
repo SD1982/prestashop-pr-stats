@@ -11,23 +11,58 @@ $sql = 'SELECT
 $db_dates = $mysql->query($sql);
 $start_date = $db_dates['min_merged'];
 $end_date = $db_dates['max_merged'];
+$granularity = 'week';
+$possibles_granularities = [
+    'day' => 'Day',
+    'week' => 'Week',
+    'month' => 'Month'
+];
 
 if (isset($_GET['start_date']) && isset($_GET['end_date'])) {
     $start_date = date('Y-m-d', strtotime($_GET['start_date']));
     $end_date = date('Y-m-d', strtotime($_GET['end_date']));
 }
+if (isset($_GET['granularity']) && in_array($_GET['granularity'], array_keys($possibles_granularities))) {
+    $granularity = $_GET['granularity'];
+}
 
 //get the data
-$sql = "SELECT YEARWEEK(merged, 3) week,
-STR_TO_DATE(CONCAT(YEARWEEK(merged, 3),' Monday'), '%x%v %W') weekday,
-AVG(time_before_first_wfqa) avg_time_before_first_wfqa,
-AVG(times_of_wfqa_labelling) avg_times_of_wfqa_labelling,
-AVG(total_time_as_wfqa) avg_total_time_as_wfqa
-FROM `pr` 
-WHERE 1=1
-AND merged BETWEEN :start_date AND :end_date
-group by YEARWEEK(merged, 3), weekday
-order by week ASC;";
+switch($granularity) {
+    case 'day':
+        $sql = "SELECT DATE(merged) granularity,
+        AVG(time_before_first_wfqa) avg_time_before_first_wfqa,
+        AVG(times_of_wfqa_labelling) avg_times_of_wfqa_labelling,
+        AVG(total_time_as_wfqa) avg_total_time_as_wfqa
+        FROM `pr` 
+        WHERE 1=1
+        AND merged BETWEEN :start_date AND :end_date
+        group by granularity
+        order by granularity ASC;";
+        break;
+    case 'week':
+        $sql = "SELECT STR_TO_DATE(CONCAT(YEARWEEK(merged, 3),' Monday'), '%x%v %W') granularity,
+        AVG(time_before_first_wfqa) avg_time_before_first_wfqa,
+        AVG(times_of_wfqa_labelling) avg_times_of_wfqa_labelling,
+        AVG(total_time_as_wfqa) avg_total_time_as_wfqa
+        FROM `pr` 
+        WHERE 1=1
+        AND merged BETWEEN :start_date AND :end_date
+        group by granularity
+        order by granularity ASC;";
+        break;
+    default:
+        $sql = "SELECT DATE_FORMAT(merged, '%Y-%m') granularity,
+        AVG(time_before_first_wfqa) avg_time_before_first_wfqa,
+        AVG(times_of_wfqa_labelling) avg_times_of_wfqa_labelling,
+        AVG(total_time_as_wfqa) avg_total_time_as_wfqa
+        FROM `pr` 
+        WHERE 1=1
+        AND merged BETWEEN :start_date AND :end_date
+        group by granularity
+        order by granularity ASC;";
+        break;
+}
+
 $data = [
         'start_date' => $start_date,
         'end_date' => $end_date,
@@ -39,7 +74,7 @@ $avg_time_before_first_wfqa = [];
 $avg_times_of_wfqa_labelling = [];
 $avg_total_time_as_wfqa = [];
 foreach($data_results as $data_result) {
-    $js_labels[] = $data_result['weekday'];
+    $js_labels[] = $data_result['granularity'];
     $avg_time_before_first_wfqa[] = $data_result['avg_time_before_first_wfqa'];
     $avg_times_of_wfqa_labelling[] = $data_result['avg_times_of_wfqa_labelling'];
     $avg_total_time_as_wfqa[] = $data_result['avg_total_time_as_wfqa'];
@@ -81,19 +116,31 @@ $colors = [
     <h1>PrestaShop PRs Stats</h1>
     <form>
         <div class="form-row">
-            <div class="col">
-                <h4>PRs merge dates interval</h4>
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="col">
+            <div class="form-group col-3">
+                <label for="start_date">Start date</label>
                 <input type="date" class="form-control" id="start_date" name="start_date" value="<?php echo $start_date; ?>" placeholder="Start Date">
             </div>
-            <div class="col">
+            <div class="form-group col-3">
+                <label for="end_date">End date</label>
                 <input type="date" class="form-control" id="end_date" name="end_date" value="<?php echo $end_date; ?>" placeholder="End Date">
             </div>
-            <div class="col">
-                <button type="submit" class="btn btn-primary">Display data</button>
+            <div class="form-group col-3">
+                <label for="granularity">Group by</label>
+                <select name="granularity" id="granularity" class="form-control" >
+                    <?php
+                    foreach ($possibles_granularities as $k => $v) {
+                        $s = '';
+                        if ($granularity == $k) {
+                            $s = 'selected';
+                        }
+                        echo '<option value='.$k.' '.$s.'>'.$v.'</option>';
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="form-group col-1">
+                <label for="">&nbsp;</label>
+                <button type="submit" class="btn btn-primary btn-block">Display</button>
             </div>
         </div>
     </form>
